@@ -14,6 +14,8 @@ class Plugin:
         if not hasattr(self, "vector_id"):
             vector = Vectors.query.first()
             self.vector_id = vector.id
+        if not hasattr(self, "text_to_say"):
+            self.text_to_say = "Hello World"
         if not hasattr(self, "log"):
             self.log = "true"
 
@@ -26,16 +28,17 @@ class Plugin:
                     "description": "which vector id to use for the command",
                 },
                 {
+                    "name": "text_to_say",
+                    "default": "Hello World",
+                    "description": "the text for vector to say",
+                },
+                {
                     "name": "log",
                     "default": "true",
                     "description": "create a log item when plugin is ran",
                 },
             ],
-            "plugin_description": "Ping a Vector",
-            "plugin_icons": [
-                {"mdi_class": "contactless", "class": "ping-btn", "tooltip": "Ping"}
-            ],
-            "plugin_js": ["ping.js"],
+            "plugin_description": "Make Vector say the given text",
             "plugin_dependencies": ["logbook"],
         }
         return interface_data
@@ -47,15 +50,19 @@ class Plugin:
         # try to send to command to the robot, log the result if log is True
         with anki_vector.Robot(vector.serial) as robot:
             try:
-                output = str(robot.behavior.say_text("ping"))
+                output = str(robot.behavior.say_text(self.text_to_say))
             except Exception as e:
                 output = e
         if self.log == "true":
-            info = f"vector_id: {self.vector_id} \n \n" f"output: {output}"
+            info = (
+                f"text_to_say: {self.text_to_say} \n \n"
+                f"vector_id: {self.vector_id} \n \n"
+                f"output: {output}"
+            )
             run_plugin(
                 "logbook",
                 {
-                    "name": f"{vector.name} was pinged",
+                    "name": f"{vector.name} ran custom say",
                     "vector_id": vector.id,
                     "info": info,
                     "log_type": "success",
