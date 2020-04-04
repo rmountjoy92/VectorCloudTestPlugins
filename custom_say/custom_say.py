@@ -2,6 +2,7 @@ import anki_vector
 from vectorcloud.main.models import Vectors
 from vectorcloud.main.utils import run_plugin
 
+# UPDATE
 
 class Plugin:
     def __init__(self, *args, **kwargs):
